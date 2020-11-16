@@ -68,7 +68,7 @@ class CurveDetection
             //options.minimizer_progress_to_stdout = true;//输出到cout
         }
         
-        CurveDetection(double* g)
+        CurveDetection(const double* g)
         {
             //initial guess
             initial_x[0] = g[0];
@@ -207,7 +207,7 @@ class CurveDetection
 
             cout<<"detected "<<locations.size()<<" non-zero points"<<endl;
 
-            if(locations.size()==0)
+            if(locations.empty())
             {
                 cout<<"No non-zero points error!!!"<<endl;
                 return;
@@ -219,14 +219,14 @@ class CurveDetection
         {
             cout<<"solve for "<<locations.size()<<" non-zero points"<<endl;
 
-            for(uint i = 0 ; i < locations.size();i++)
+            for(auto & location : locations)
             {
                 //cout<<"locations[i] = "<<locations[i]<<endl;
-                x_min = min(x_min,locations[i].x);
-                x_max = max(x_max,locations[i].x);
+                x_min = min(x_min,location.x);
+                x_max = max(x_max,location.x);
 
-                CostFunction* cost_function = new NumericDiffCostFunction<CostFunctor, CENTRAL, 1, 3>(new CostFunctor(locations[i].x,locations[i].y)); //使用自动求导，将之前的代价函数结构体传入，第一个1是输出维度，即残差的维度，第二个1是输入维度，即>待寻优参数x的维度。
-                problem.AddResidualBlock(cost_function, NULL, x); //向问题中添加误差项，本问题比较简单，添加一个就行。
+                CostFunction* cost_function = new NumericDiffCostFunction<CostFunctor, CENTRAL, 1, 3>(new CostFunctor(location.x,location.y)); //使用自动求导，将之前的代价函数结构体传入，第一个1是输出维度，即残差的维度，第二个1是输入维度，即>待寻优参数x的维度。
+                problem.AddResidualBlock(cost_function, nullptr, x); //向问题中添加误差项，本问题比较简单，添加一个就行。
             }
 
 
@@ -254,7 +254,7 @@ class CurveDetection
                 //cout<<"tcol = "<<tcol<<", trow = "<<trow<<" ,imgBinary.cols = "<<imgBinary.cols<<", imgBinary.rows = "<<imgBinary.rows<<endl;
                 if(trow>=0 && tcol>=0 && tcol <imgBinary.cols && trow<imgBinary.rows)
                 {
-                    output.push_back(Point2d(tcol,trow));
+                    output.emplace_back(tcol,trow);
                 }
             }
         }        

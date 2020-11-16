@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 
     int frameCount = 0;
 
-    double* params_y = (double*)calloc(3,sizeof(double));
-    double* params_w = (double*)calloc(3,sizeof(double));
+    auto* params_y = static_cast<double*>(calloc(3,sizeof(double)));
+    auto* params_w = static_cast<double*>(calloc(3,sizeof(double)));
 
     // void fill_n (OutputIterator first, Size n, const T& val);
     fill_n(params_y,3,1);
@@ -41,8 +41,9 @@ int main(int argc, char** argv)
     {
         cap>>input;
 
-        if (input.empty())
+        if (input.empty()) {
             break;
+}
 
 
         //imshow("Input",input);
@@ -166,18 +167,18 @@ int main(int argc, char** argv)
 
         Mat loc_mat_y = Mat::zeros( topview_yellow_filter.rows, topview_yellow_filter.cols, topview_yellow_filter.type() );
         vector<Point> print_points_y = cd_y.getLocations();
-        for(uint i = 0; i<result_y.size(); i++)
+        for(auto & i : result_y)
         {
-            trow = result_y[i].y;
-            tcol = result_y[i].x;
+            trow = i.y;
+            tcol = i.x;
             //topview_yellow_curve.at<Vec3b>(trow,tcol) = Vec3b(255,0,0);
             topview_curve.at<Vec3b>(trow,tcol) = Vec3b(255,0,0);
         }
 
-        for(uint i = 0; i<print_points_y.size(); i++)
+        for(auto & i : print_points_y)
         {
-            trow = print_points_y[i].y;
-            tcol = print_points_y[i].x;
+            trow = i.y;
+            tcol = i.x;
             loc_mat_y.at<uchar>(trow,tcol) = 255;
         }
 
@@ -193,18 +194,18 @@ int main(int argc, char** argv)
 
         Mat loc_mat_w = Mat::zeros( topview_white_filter.rows, topview_white_filter.cols, topview_white_filter.type() );
         vector<Point> print_points_w = cd_w.getLocations();
-        for(uint i = 0; i<result_w.size(); i++)
+        for(auto & i : result_w)
         {
-            trow = result_w[i].y;
-            tcol = result_w[i].x;
+            trow = i.y;
+            tcol = i.x;
             //topview_white_curve.at<Vec3b>(trow,tcol) = Vec3b(255,0,0);
             topview_curve.at<Vec3b>(trow,tcol) = Vec3b(0,255,0);
         }
 
-        for(uint i = 0; i<print_points_w.size(); i++)
+        for(auto & i : print_points_w)
         {
-            trow = print_points_w[i].y;
-            tcol = print_points_w[i].x;
+            trow = i.y;
+            tcol = i.x;
             loc_mat_w.at<uchar>(trow,tcol) = 255;
         }
 
@@ -279,7 +280,7 @@ int main(int argc, char** argv)
         vector<Point> back_proj_points_y;
         for(uint i = 0; i<bp.rows-1; i++)
         {
-            back_proj_points_y.push_back(Point(bp.at<double>(i,0),bp.at<double>(i,1)));
+            back_proj_points_y.emplace_back(bp.at<double>(i,0),bp.at<double>(i,1));
             //line(re_proj, Point(bp.at<double>(i,0),bp.at<double>(i,1)), Point(bp.at<double>(i+1,0),bp.at<double>(i+1,1)), Scalar(255,0,0), 5, 8, 0);
             //cout<<"result[i] = "<<result[i]<<endl;
             trow = bp.at<double>(i,1);
@@ -309,7 +310,7 @@ int main(int argc, char** argv)
         vector<Point> back_proj_points_w;
         for(uint i = 0; i<bp.rows-1; i++)
         {
-            back_proj_points_w.push_back(Point(bp.at<double>(i,0),bp.at<double>(i,1)));
+            back_proj_points_w.emplace_back(bp.at<double>(i,0),bp.at<double>(i,1));
             //line(re_proj, Point(bp.at<double>(i,0),bp.at<double>(i,1)), Point(bp.at<double>(i+1,0),bp.at<double>(i+1,1)), Scalar(0,255,0), 5, 8, 0);
             trow = bp.at<double>(i,1);
             tcol = bp.at<double>(i,0);
@@ -329,7 +330,7 @@ int main(int argc, char** argv)
         }
 
         const Point* ppt[1] = {back_proj_points2.data()};
-        int npt[] = {back_proj_points_y.size()+back_proj_points_w.size()};
+        int npt[] = {static_cast<int>(back_proj_points_y.size()+back_proj_points_w.size())};
         //polylines(re_proj, ppt, npt, 1, 1, Scalar(255),1,8,0);
         Mat paint_cover = Mat::zeros(Size(re_proj.cols,re_proj.rows),re_proj.type());
         fillPoly(paint_cover, ppt, npt, 1, Scalar(255,0,120,0.5));

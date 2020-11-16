@@ -2,7 +2,9 @@
 
 
 #include <opencv2/opencv.hpp>
-#include "../cvminecraft/curve_detection/CurveDetection.hpp"
+#include "CurveDetection.hpp"
+
+#include <vector>
 
 using namespace cv;
 
@@ -38,6 +40,9 @@ int main(int argc, char** argv)
     while(cap.isOpened())
     {
         cap>>input;
+
+        if (input.empty())
+            break;
 
 
         //imshow("Input",input);
@@ -311,19 +316,19 @@ int main(int argc, char** argv)
             //re_proj.at<Vec3b>(trow,tcol) = Vec3b(0,255,0);
         }
 
-        Point back_proj_points2[1][back_proj_points_y.size()+back_proj_points_w.size()];
+        std::vector<Point> back_proj_points2(back_proj_points_y.size()+back_proj_points_w.size());
         
         for(uint i = 0 ; i <back_proj_points_y.size();i++)
         {
-            back_proj_points2[0][i] = back_proj_points_y[i];
+            back_proj_points2[i] = back_proj_points_y[i];
         }
 
         for(uint i = 0 ; i <back_proj_points_w.size();i++)
         {
-            back_proj_points2[0][back_proj_points_y.size()+i] = back_proj_points_w[back_proj_points_w.size()-1-i];
+            back_proj_points2[back_proj_points_y.size()+i] = back_proj_points_w[back_proj_points_w.size()-1-i];
         }
 
-        const Point* ppt[1] = {back_proj_points2[0]};
+        const Point* ppt[1] = {back_proj_points2.data()};
         int npt[] = {back_proj_points_y.size()+back_proj_points_w.size()};
         //polylines(re_proj, ppt, npt, 1, 1, Scalar(255),1,8,0);
         Mat paint_cover = Mat::zeros(Size(re_proj.cols,re_proj.rows),re_proj.type());
